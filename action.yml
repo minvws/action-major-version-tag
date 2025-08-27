@@ -1,0 +1,28 @@
+name: Major version tag
+description: When triggered for a tag, create or update the corresponding major version tag.
+
+runs:
+  using: composite
+  steps:
+    - name: Exit early if ref_type is not tag
+      if: github.ref_type != "tag"
+      shell: bash
+      run: |
+        echo "This action only runs for tags. Exiting."
+        gh run cancel ${{ github.run_id }}
+        gh run watch ${{ github.run_id }}
+
+    - name: Setup git user
+      shell: bash
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Create or update major version tag
+      shell: bash
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        TAG=$(echo "$VERSION" | grep -Eo 'v[0-9]+')
+        echo "Setting $TAG tag to $VERSION"
+        git tag -fa "$TAG" "$VERSION" -m "Set $TAG tag to $VERSION"
+        git push -f origin "$TAG"
