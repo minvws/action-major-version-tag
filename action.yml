@@ -5,7 +5,7 @@ runs:
   using: composite
   steps:
     - name: Exit early if ref_type is not tag
-      if: ${{ github.ref_type != "tag" }}
+      if: ${{ github.ref_type != 'tag' }}
       shell: bash
       run: |
         echo "This action only runs for tags. Exiting."
